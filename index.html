@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inserir e Listar Objetos do Firestore</title>
+</head>
+<body>
+    <h1>Inserir e Listar Objetos do Firestore</h1>
+    <form id="form">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome"><br><br>
+        <label for="ra">RA:</label>
+        <input type="text" id="ra" name="ra"><br><br>
+        <label for="curso">Curso:</label>
+        <input type="text" id="curso" name="curso"><br><br>
+        <label for="email">E-mail:</label>
+        <input type="text" id="email" name="email"><br><br>
+        <button id="btn-inserir">Inserir</button>
+    </form>
+    <ul id="lista-objetos"></ul>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js';
+        import { getFirestore, collection, addDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js';
+
+        // Initialize Firebase
+        const firebaseConfig = {
+          apiKey: "AIzaSyB4NsnuQdKe1MUrPZroJnM1RsVvAXXpKCk",
+          authDomain: "frontoo-41690.firebaseapp.com",
+          projectId: "frontoo-41690",
+          storageBucket: "frontoo-41690.appspot.com",
+          messagingSenderId: "33604005665",
+          appId: "1:33604005665:web:f5faf3669660ae9c459860"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Referência à coleção do Firestore
+        const colecao = collection(db, "alunos");
+
+        // Função para inserir objeto na coleção
+        document.getElementById("btn-inserir").addEventListener("click", async function(event) {
+            event.preventDefault();
+            var nome = document.getElementById("nome").value;
+            var ra = document.getElementById("ra").value;
+            var curso = document.getElementById("curso").value;
+            var email = document.getElementById("email").value;
+
+            try {
+                const docRef = await addDoc(colecao, {
+                    nome: nome,
+                    ra: ra,
+                    curso: curso,
+                    email: email
+                });
+                console.log("Objeto inserido com sucesso!");
+                document.getElementById("nome").value = "";
+                document.getElementById("ra").value = "";
+                document.getElementById("curso").value = "";
+                document.getElementById("email").value = "";
+            } catch (error) {
+                console.error("Erro ao inserir objeto:", error);
+            }
+        });
+
+        // Função para listar objetos da coleção
+        onSnapshot(colecao, function(querySnapshot) {
+            var lista = document.getElementById("lista-objetos");
+            lista.innerHTML = "";
+            querySnapshot.forEach(function(doc) {
+                var li = document.createElement("li");
+                li.textContent = doc.data().nome + " - " + doc.data().ra + " - " + doc.data().curso + " - " + doc.data().email;
+                lista.appendChild(li);
+            });
+        });
+    </script>
+</body>
+</html>
